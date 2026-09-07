@@ -9,3 +9,5 @@ github.com/xiph/rnnoise
 github.com/fgnt/nara_wpe
 
 github.com/sas91/jhu-neural-wpe
+
+github.com/ef191/python310_dlls
