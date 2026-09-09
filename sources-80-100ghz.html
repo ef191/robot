@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Making a signal at 80–100 GHz</title>
+<style>
+  :root{
+    --paper:#ECEFF0;
+    --panel:#F6F8F8;
+    --ink:#141A1D;
+    --muted:#5B6771;
+    --rule:#C6CCCF;
+    --solid:#1F6F8B;   /* semiconductor */
+    --vac:#A9541F;     /* vacuum electronics */
+    --solid-soft:#D6E5EB;
+    --vac-soft:#EDDCD1;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:Charter,"Bitstream Charter","Iowan Old Style","Source Serif Pro",Georgia,serif;
+    font-size:18px;
+    line-height:1.62;
+  }
+  .wrap{max-width:820px;margin:0 auto;padding:56px 28px 96px}
+  .col{max-width:64ch}
+
+  h1{
+    font-size:2.35rem;line-height:1.12;font-weight:600;
+    letter-spacing:-.015em;margin:0 0 .5rem;max-width:18ch;
+  }
+  .standfirst{font-size:1.12rem;color:var(--muted);margin:0 0 2.6rem;max-width:56ch}
+
+  h2{
+    font-size:1.4rem;font-weight:600;letter-spacing:-.01em;
+    margin:3.2rem 0 .9rem;padding-top:.9rem;border-top:1px solid var(--rule);
+  }
+  h3{font-size:1.06rem;font-weight:600;margin:2rem 0 .4rem}
+  p{margin:0 0 1.05rem}
+  strong{font-weight:600}
+  a{color:var(--solid)}
+
+  ul{margin:0 0 1.1rem;padding-left:1.1rem}
+  li{margin-bottom:.45rem}
+
+  figure{margin:2.4rem 0;max-width:100%}
+  figure svg{display:block;width:100%;height:auto}
+  figcaption{
+    font-family:ui-sans-serif,"Helvetica Neue",Arial,sans-serif;
+    font-size:.83rem;line-height:1.5;color:var(--muted);
+    margin-top:.7rem;max-width:64ch;
+  }
+
+  table{
+    border-collapse:collapse;width:100%;margin:1.6rem 0 2rem;
+    font-family:ui-sans-serif,"Helvetica Neue",Arial,sans-serif;
+    font-size:.86rem;line-height:1.45;
+  }
+  th{
+    text-align:left;font-weight:600;padding:.5rem .7rem .5rem 0;
+    border-bottom:1.5px solid var(--ink);vertical-align:bottom;
+  }
+  td{padding:.62rem .7rem .62rem 0;border-bottom:1px solid var(--rule);vertical-align:top}
+  td:first-child{font-weight:600;padding-right:1rem}
+
+  .note{
+    background:var(--panel);border-left:3px solid var(--solid);
+    padding:1.05rem 1.2rem;margin:1.8rem 0;font-size:.95rem;
+  }
+  .note p:last-child{margin-bottom:0}
+  .note.vac{border-left-color:var(--vac)}
+
+  .math{
+    font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    font-size:.9rem;background:var(--panel);padding:.75rem .9rem;
+    display:block;margin:1rem 0;border:1px solid var(--rule);
+  }
+
+  .refs{font-size:.84rem;line-height:1.55;color:var(--muted)}
+  .refs li{margin-bottom:.6rem;word-break:break-word}
+
+  @media (max-width:640px){
+    body{font-size:17px}
+    h1{font-size:1.85rem}
+    .wrap{padding:36px 20px 72px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="col">
+
+<h1>Making a signal at 80–100 GHz</h1>
+<p class="standfirst">Yes — and not just one or two exotic parts. This band is served by mass-produced $20 silicon chips at the low-power end and by 100-kilowatt vacuum tubes at the high-power end. The real question is which one you need.</p>
+
+<p>80–100 GHz sits inside what radio engineers call the <strong>W band</strong>, which runs from 75 to 110 GHz. It is not frontier territory any more. Three separate industries have pushed hardware into it over the past few decades — car radar, point-to-point telecom links, and military/scientific radar — and each left behind a different family of parts.</p>
+
+<p>The rest of this document walks through those families, explains <em>why</em> each one exists (the physics that makes a chip good at one thing and a tube good at another), and ends with a table you can use to pick.</p>
+
+</div>
+
+<figure>
+<svg viewBox="0 0 800 210" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Map of the 70 to 110 gigahertz spectrum showing named sub-bands">
+  <defs>
+    <style>
+      .lbl{font-family:ui-sans-serif,Helvetica,Arial,sans-serif;font-size:11px;fill:#5B6771}
+      .lbl-d{font-family:ui-sans-serif,Helvetica,Arial,sans-serif;font-size:11.5px;fill:#141A1D;font-weight:600}
+      .tick{stroke:#C6CCCF;stroke-width:1}
+    </style>
+  </defs>
+
+  <!-- asked-for range shading -->
+  <rect x="235" y="26" width="350" height="128" fill="#DDE4E6"/>
+  <text x="410" y="20" class="lbl-d" text-anchor="middle" fill="#5B6771">the range you asked about: 80–100 GHz</text>
+
+  <!-- sub-band blocks -->
+  <rect x="77.5" y="40" width="87.5" height="26" fill="#D6E5EB" stroke="#1F6F8B" stroke-width="1"/>
+  <text x="121" y="57" class="lbl" text-anchor="middle" fill="#1F6F8B">71–76</text>
+  <rect x="252.5" y="40" width="87.5" height="26" fill="#D6E5EB" stroke="#1F6F8B" stroke-width="1"/>
+  <text x="296" y="57" class="lbl" text-anchor="middle" fill="#1F6F8B">81–86</text>
+  <text x="209" y="33" class="lbl-d" text-anchor="middle">E-band telecom links</text>
+
+  <rect x="165" y="76" width="87.5" height="26" fill="#EDDCD1" stroke="#A9541F" stroke-width="1"/>
+  <text x="209" y="93" class="lbl" text-anchor="middle" fill="#A9541F">76–81</text>
+  <text x="209" y="118" class="lbl-d" text-anchor="middle">car radar</text>
+
+  <!-- 94 GHz window -->
+  <line x1="480" y1="40" x2="480" y2="128" stroke="#141A1D" stroke-width="1.5" stroke-dasharray="3 3"/>
+  <circle cx="480" cy="40" r="3.5" fill="#141A1D"/>
+  <text x="488" y="52" class="lbl-d">94 GHz</text>
+  <text x="488" y="68" class="lbl">clear-air window: radar,</text>
+  <text x="488" y="82" class="lbl">imaging, cloud profiling</text>
+
+  <!-- W band bar -->
+  <rect x="147.5" y="140" width="612.5" height="14" fill="#141A1D"/>
+  <text x="454" y="151" class="lbl" text-anchor="middle" fill="#ECEFF0">W band, 75–110 GHz</text>
+
+  <!-- axis -->
+  <line x1="40" y1="172" x2="780" y2="172" stroke="#141A1D" stroke-width="1.5"/>
+  <g>
+    <line x1="60" y1="172" x2="60" y2="178" class="tick"/><text x="60" y="192" class="lbl" text-anchor="middle">70</text>
+    <line x1="235" y1="172" x2="235" y2="178" class="tick"/><text x="235" y="192" class="lbl" text-anchor="middle">80</text>
+    <line x1="410" y1="172" x2="410" y2="178" class="tick"/><text x="410" y="192" class="lbl" text-anchor="middle">90</text>
+    <line x1="585" y1="172" x2="585" y2="178" class="tick"/><text x="585" y="192" class="lbl" text-anchor="middle">100</text>
+    <line x1="760" y1="172" x2="760" y2="178" class="tick"/><text x="760" y="192" class="lbl" text-anchor="middle">110</text>
+  </g>
+  <text x="410" y="207" class="lbl" text-anchor="middle">frequency (GHz)</text>
+</svg>
+<figcaption>Your 80–100 GHz span overlaps three separate hardware ecosystems. The bottom edge is car-radar silicon (76–81 GHz) and upper E-band telecom (81–86 GHz). The middle, around 94 GHz, is an atmospheric window where the air is relatively transparent, which is why radar and imaging systems cluster there. Above about 100 GHz parts get noticeably scarcer and more expensive.</figcaption>
+</figure>
+
+<div class="col">
+
+<h2>The two worlds: semiconductors and electron beams</h2>
+
+<p>Everything that oscillates at these frequencies falls into one of two camps, and they do not really compete with each other — they occupy different ends of a power scale that spans about nine decades.</p>
+
+<p><strong>Semiconductors</strong> push electrons through a solid crystal. They are small, cheap, run off low voltages, and last for years. But the crystal itself sets a hard ceiling on power: the material can only stand so much electric field before it breaks down, and it can only get so hot before it fails. At 90 GHz, the transistors also have to be physically tiny to be fast, and tiny transistors cannot carry much current. Realistically you get milliwatts to a couple of watts from a single chip.</p>
+
+<p><strong>Vacuum electronics</strong> — tubes — accelerate a beam of electrons through empty space and then steal energy from that beam. Vacuum has no breakdown limit worth speaking of at these scales and does not overheat. You pay for that with kilovolts of supply voltage, a heated cathode, sometimes a superconducting magnet, a limited lifetime, and a device the size of a briefcase or a filing cabinet. In exchange you get hundreds of watts to hundreds of kilowatts.</p>
+
+</div>
+
+<figure>
+<svg viewBox="0 0 800 430" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Chart of typical output power by source technology at 80 to 100 gigahertz, on a logarithmic scale">
+  <defs>
+    <style>
+      .rl{font-family:ui-sans-serif,Helvetica,Arial,sans-serif;font-size:12px;fill:#141A1D}
+      .rs{font-family:ui-sans-serif,Helvetica,Arial,sans-serif;font-size:10.5px;fill:#5B6771}
+      .ax{font-family:ui-sans-serif,Helvetica,Arial,sans-serif;font-size:10.5px;fill:#5B6771}
+      .grid{stroke:#D5DADC;stroke-width:1}
+    </style>
+  </defs>
+
+  <!-- gridlines: x = 176 + log10(mW)*67 , 0..9 decades -->
+  <g>
+    <line x1="176" y1="34" x2="176" y2="368" class="grid"/><text x="176" y="386" class="ax" text-anchor="middle">1 mW</text>
+    <line x1="243" y1="34" x2="243" y2="368" class="grid"/><text x="243" y="386" class="ax" text-anchor="middle">10 mW</text>
+    <line x1="310" y1="34" x2="310" y2="368" class="grid"/><text x="310" y="386" class="ax" text-anchor="middle">100 mW</text>
+    <line x1="377" y1="34" x2="377" y2="368" class="grid"/><text x="377" y="386" class="ax" text-anchor="middle">1 W</text>
+    <line x1="444" y1="34" x2="444" y2="368" class="grid"/><text x="444" y="386" class="ax" text-anchor="middle">10 W</text>
+    <line x1="511" y1="34" x2="511" y2="368" class="grid"/><text x="511" y="386" class="ax" text-anchor="middle">100 W</text>
+    <line x1="578" y1="34" x2="578" y2="368" class="grid"/><text x="578" y="386" class="ax" text-anchor="middle">1 kW</text>
+    <line x1="645" y1="34" x2="645" y2="368" class="grid"/><text x="645" y="386" class="ax" text-anchor="middle">10 kW</text>
+    <line x1="712" y1="34" x2="712" y2="368" class="grid"/><text x="712" y="386" class="ax" text-anchor="middle">100 kW</text>
+    <line x1="779" y1="34" x2="779" y2="368" class="grid"/><text x="779" y="386" class="ax" text-anchor="middle">1 MW</text>
+  </g>
+
+  <!-- rows -->
+  <!-- multiplier chain 0.1-10mW => log -1 .. 1 => x 109..243 -->
+  <text x="164" y="53" class="rl" text-anchor="end">Multiplier chain</text>
+  <rect x="109" y="42" width="134" height="15" rx="7.5" fill="#D6E5EB" stroke="#1F6F8B"/>
+
+  <!-- BWO 1-100 mW => 176..310 -->
+  <text x="164" y="83" class="rl" text-anchor="end">Backward-wave tube</text>
+  <rect x="176" y="72" width="134" height="15" rx="7.5" fill="#EDDCD1" stroke="#A9541F"/>
+
+  <!-- CMOS/SiGe 1-50mW => 176..289 -->
+  <text x="164" y="113" class="rl" text-anchor="end">CMOS / SiGe chip</text>
+  <rect x="176" y="102" width="113" height="15" rx="7.5" fill="#D6E5EB" stroke="#1F6F8B"/>
+
+  <!-- Gunn 10-150mW => 243..322 -->
+  <text x="164" y="143" class="rl" text-anchor="end">Gunn diode</text>
+  <rect x="243" y="132" width="79" height="15" rx="7.5" fill="#D6E5EB" stroke="#1F6F8B"/>
+
+  <!-- GaAs/InP MMIC 10-300mW => 243..343 -->
+  <text x="164" y="173" class="rl" text-anchor="end">GaAs / InP MMIC</text>
+  <rect x="243" y="162" width="100" height="15" rx="7.5" fill="#D6E5EB" stroke="#1F6F8B"/>
+
+  <!-- IMPATT 100mW-1W => 310..377 -->
+  <text x="164" y="203" class="rl" text-anchor="end">IMPATT diode</text>
+  <rect x="310" y="192" width="67" height="15" rx="7.5" fill="#D6E5EB" stroke="#1F6F8B"/>
+
+  <!-- GaN MMIC 100mW - 3W => 310..394 -->
+  <text x="164" y="233" class="rl" text-anchor="end">GaN MMIC</text>
+  <rect x="310" y="222" width="84" height="15" rx="7.5" fill="#D6E5EB" stroke="#1F6F8B"/>
+
+  <!-- EIO/EIK 100W - 5kW => 511..605 -->
+  <text x="164" y="263" class="rl" text-anchor="end">EIO / EIK tube</text>
+  <rect x="511" y="252" width="94" height="15" rx="7.5" fill="#EDDCD1" stroke="#A9541F"/>
+
+  <!-- Gyrotron 5kW - 150kW => 625..717 -->
+  <text x="164" y="293" class="rl" text-anchor="end">Gyrotron</text>
+  <rect x="625" y="282" width="92" height="15" rx="7.5" fill="#EDDCD1" stroke="#A9541F"/>
+
+  <!-- axis line -->
+  <line x1="176" y1="368" x2="779" y2="368" stroke="#141A1D" stroke-width="1.5"/>
+
+  <!-- legend -->
+  <rect x="176" y="404" width="13" height="13" rx="3" fill="#D6E5EB" stroke="#1F6F8B"/>
+  <text x="196" y="415" class="rs">solid state (a chip or diode)</text>
+  <rect x="400" y="404" width="13" height="13" rx="3" fill="#EDDCD1" stroke="#A9541F"/>
+  <text x="420" y="415" class="rs">vacuum electronics (a tube)</text>
+
+  <text x="478" y="20" class="rs" text-anchor="middle">typical output power available near 94 GHz — note the scale is logarithmic, each step is ten times more power</text>
+</svg>
+<figcaption>Rough ranges, not guarantees — exact numbers depend on the specific part, whether it runs continuously or in pulses, and how hard you drive it. The gap in the middle is real: between about 3 watts and 100 watts at 94 GHz you generally have to combine several solid-state amplifiers together, because nothing single-device fills it neatly.</figcaption>
+</figure>
+
+<div class="col">
+
+<h2>The chip options</h2>
+
+<h3>Car-radar silicon — the cheapest way in</h3>
+
+<p>If your target is 76–81 GHz, the problem is already solved by the automotive industry at enormous volume. These are complete radar transceivers on one silicon die: several transmitters, several receivers, the oscillator, and the analogue-to-digital converters, all integrated.</p>
+
+<p>Texas Instruments' AWR family and NXP's TEF82xx are the two obvious examples. NXP's part covers the whole 76–81 GHz band with three transmitters and four receivers on a single RF-CMOS chip. TI publishes list prices — an 8-transmit/8-receive 76–81 GHz transceiver sits around <strong>$25 in thousand-unit quantities</strong>. That is remarkable for a 77 GHz radio.</p>
+
+<p>The catch is that these are radar chips, not general-purpose signal sources. The oscillator is deeply buried in a chirp-generation engine designed to sweep across the band; getting a clean, steady, arbitrary single tone out of one takes some fighting with the register map. And they will not go above 81 GHz.</p>
+
+<h3>Why so many chips multiply up instead of oscillating directly</h3>
+
+<p>This is worth explaining properly, because it explains most of the architecture choices you will see in datasheets.</p>
+
+<p>An oscillator is a resonator plus an amplifier that keeps it ringing. The purity of the output — how close the signal is to a single clean frequency rather than a smear — depends heavily on the <strong>quality factor</strong> (Q) of the resonator. Q is basically "how many cycles does this thing ring for after you stop pushing it." High Q, clean signal.</p>
+
+<p>The trouble is that on-chip resonators get much worse as frequency climbs. At 20 GHz you can build an on-chip inductor-capacitor tank with a Q of maybe 15–20. At 90 GHz the wiring losses, the substrate losses and the transistor's own parasitic capacitance drag you down to something like 8–15, and the tuning varactor you need for frequency control makes it worse still. Leeson's model, which is the standard way of predicting oscillator noise, says the noise power goes as <strong>1/Q²</strong> — so halving your Q costs you about 6 dB.</p>
+
+<p>So the trick is: build the oscillator low, where Q is good, then multiply the frequency up. Multiply by 4 and 20 GHz becomes 80 GHz.</p>
+
+<p>Multiplication is not free. Every time you multiply the frequency by N, you also multiply the <em>phase</em> of the signal by N — including all the random phase wobble. In power terms the noise goes up by:</p>
+
+<span class="math">phase noise penalty = 20 × log₁₀(N) decibels</span>
+
+<p>For N = 4, that is 20 × log₁₀(4) ≈ <strong>12 dB worse</strong>. For N = 6, about 15.6 dB. For N = 8, 18 dB.</p>
+
+<p>The reason the trick still wins is that the low-frequency oscillator starts out more than 12 dB better. If your 20 GHz oscillator is 20 dB quieter than a 80 GHz one would have been, paying 12 dB to multiply up still leaves you 8 dB ahead. That is the whole argument, and it is why TI's AWR1243, for example, generates its signal in an RF synthesizer and then runs it through a <strong>×4 multiplier</strong> to reach the 76–81 GHz band.</p>
+
+<p>It is not a universal law, though. Direct W-band oscillators built in modern silicon are perfectly real: a published 65 nm CMOS design locks from <strong>78.8 to 84 GHz</strong> with about 13.5 dBm (roughly 22 mW) of output from the oscillator itself — respectable power for a bare CMOS chip.</p>
+
+</div>
+
+<figure>
+<svg viewBox="0 0 800 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Block diagram comparing a multiplied-up oscillator chain with a direct fundamental oscillator">
+  <defs>
+    <style>
+      .bx{fill:#F6F8F8;stroke:#141A1D;stroke-width:1.4}
+      .bt{font-family:ui-sans-serif,Helvetica,Arial,sans-serif;font-size:11.5px;fill:#141A1D;font-weight:600}
+      .bs{font-family:ui-sans-serif,Helvetica,Arial,sans-serif;font-size:10px;fill:#5B6771}
+      .hd{font-family:ui-sans-serif,Helvetica,Arial,sans-serif;font-size:12.5px;fill:#141A1D;font-weight:600}
+      .ar{stroke:#141A1D;stroke-width:1.4;fill:none;marker-end:url(#a)}
+    </style>
+    <marker id="a" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M0,1 L7,4 L0,7 z" fill="#141A1D"/>
+    </marker>
+  </defs>
+
+  <!-- LANE A -->
+  <text x="20" y="26" class="hd">A · multiply up — most silicon radar chips</text>
+
+  <rect x="20" y="44" width="118" height="52" rx="4" class="bx"/>
+  <text x="79" y="66" class="bt" text-anchor="middle">Crystal + PLL</text>
+  <text x="79" y="82" class="bs" text-anchor="middle">40 MHz → ~20 GHz</text>
+
+  <line x1="138" y1="70" x2="182" y2="70" class="ar"/>
+
+  <rect x="188" y="44" width="104" height="52" rx="4" class="bx" fill="#D6E5EB"/>
+  <text x="240" y="66" class="bt" text-anchor="middle">× 4 multiplier</text>
+  <text x="240" y="82" class="bs" text-anchor="middle">+12 dB noise</text>
+
+  <line x1="292" y1="70" x2="336" y2="70" class="ar"/>
+
+  <rect x="342" y="44" width="104" height="52" rx="4" class="bx"/>
+  <text x="394" y="66" class="bt" text-anchor="middle">Amplifier</text>
+  <text x="394" y="82" class="bs" text-anchor="middle">buffer + PA</text>
+
+  <line x1="446" y1="70" x2="490" y2="70" class="ar"/>
+  <text x="500" y="66" class="bt">76–81 GHz out</text>
+  <text x="500" y="83" class="bs">~10–100 mW</text>
+
+  <text x="20" y="122" class="bs">Good Q at 20 GHz buys more than the ×4 multiplication costs. This is why the architecture wins.</text>
+
+  <!-- divider -->
+  <line x1="20" y1="146" x2="780" y2="146" stroke="#C6CCCF" stroke-width="1"/>
+
+  <!-- LANE B -->
+  <text x="20" y="180" class="hd">B · oscillate directly at the target frequency</text>
+
+  <rect x="20" y="198" width="150" height="52" rx="4" class="bx" fill="#D6E5EB"/>
+  <text x="95" y="220" class="bt" text-anchor="middle">W-band oscillator</text>
+  <text x="95" y="236" class="bs" text-anchor="middle">transistor or Gunn diode</text>
+
+  <rect x="20" y="256" width="150" height="26" rx="4" fill="none" stroke="#5B6771" stroke-width="1" stroke-dasharray="3 3"/>
+  <text x="95" y="273" class="bs" text-anchor="middle">resonator: on-chip tank or waveguide cavity</text>
+
+  <line x1="170" y1="224" x2="214" y2="224" class="ar"/>
+
+  <rect x="220" y="198" width="104" height="52" rx="4" class="bx"/>
+  <text x="272" y="220" class="bt" text-anchor="middle">Buffer / PA</text>
+  <text x="272" y="236" class="bs" text-anchor="middle">optional</text>
+
+  <line x1="324" y1="224" x2="368" y2="224" class="ar"/>
+  <text x="378" y="220" class="bt">80–100 GHz out</text>
+  <text x="378" y="237" class="bs">simpler chain, no multiplication penalty</text>
+
+  <text x="20" y="296" class="bs">Whether this beats lane A depends entirely on the resonator. A waveguide cavity (Q in the thousands) wins easily; an on-chip tank usually does not.</text>
+</svg>
+<figcaption>The two architectures. Lane A trades a known 12 dB penalty for a much better starting point. Lane B is cleaner in principle and wins outright when you can use a real metal cavity as the resonator — which is exactly what a waveguide Gunn oscillator does.</figcaption>
+</figure>
+
+<div class="col">
+
+<h3>Compound-semiconductor MMICs</h3>
+
+<p>Where silicon runs out, gallium arsenide, indium phosphide and gallium nitride take over. These materials move electrons faster and stand higher voltages, so they make faster and more powerful circuits — at higher cost and lower integration.</p>
+
+<ul>
+<li><strong>GaAs pHEMT</strong> is the workhorse. Published 0.1 µm GaAs pHEMT power amplifiers deliver around <strong>24 dBm (roughly 250 mW) across 88–97 GHz</strong> with about 24% efficiency at 94 GHz. Pair one with an oscillator and you have a solid source.</li>
+<li><strong>InP</strong> HEMT and HBT go higher in frequency than anything else in solid state — the same technology reaches into the hundreds of GHz — but wafers are expensive and suppliers are few.</li>
+<li><strong>GaN</strong> is the high-power option. One reported approach takes a 25 GHz GaN oscillator and runs it through two cascaded doublers (a ×4 quadrupler) to cover <strong>92–103 GHz</strong>, and claimed the best far-from-carrier phase noise in W band at the time.</li>
+</ul>
+
+<h3>Diode oscillators in a waveguide cavity</h3>
+
+<p>This is the old-school approach and it is still excellent. A <strong>Gunn diode</strong> is a lump of gallium arsenide or indium phosphide with a peculiar property: over a certain voltage range, pushing harder makes <em>less</em> current flow. That negative slope is, electrically, a negative resistance — it cancels loss instead of adding it. Drop the diode into a machined metal waveguide cavity and the cavity rings.</p>
+
+<p>The cavity is the point. A precision-machined waveguide resonator has a Q in the thousands, not the tens. That is why these still have better close-in phase noise than most chips. A representative catalogue part is Farran's GV-10: <strong>94 GHz, 10 mW minimum, tunable ±750 MHz</strong> by a varactor over 0 to −25 V.</p>
+
+<p>An <strong>IMPATT diode</strong> gets you more power — hundreds of milliwatts to a watt or so — by deliberately running an avalanche breakdown in the junction. It is noisier than a Gunn, because avalanche multiplication is a fundamentally random process, and it runs hot. Use it when you need power more than purity.</p>
+
+<h3>Multiplier chains and bench instruments</h3>
+
+<p>The standard laboratory answer is: take a good microwave synthesizer at 12–18 GHz and multiply it by 6 or 8 into W band. Vendors such as Virginia Diodes and Millitech sell the multiplier modules as waveguide bricks.</p>
+
+<div class="note">
+<p><strong>Be realistic about multiplier loss.</strong> One published system feeds a 35 GHz Gunn source producing 40 mW into a tripler and gets <strong>0.4 to 0.7 mW at 105 GHz</strong> — a conversion loss of roughly 18 to 20 dB. That is normal for passive diode multipliers at these frequencies. If you need real power out of a multiplied source, budget for a W-band amplifier after it, not just a bigger driver before it.</p>
+</div>
+
+<h2>The tube options</h2>
+
+<p>If you need more than a few watts at 94 GHz, you are in tube territory. All of these work on the same underlying idea — an electron beam flies past a structure, the structure's electric field bunches the electrons into clumps, and the clumps then radiate energy back into the structure — but they differ in how the bunching happens.</p>
+
+<h3>Extended interaction oscillator (EIO)</h3>
+
+<p>The EIO is the standard high-power W-band radar source. It is essentially a very short klystron: a single resonant cavity containing a slow-wave structure with several gaps, arranged so a moderate-voltage electron beam interacts with the wave over an extended distance rather than at one point — hence the name. CPI in Canada is the long-standing commercial supplier; the technology dates back to Varian Canada work in the early 1980s.</p>
+
+<p>At 94 GHz these deliver <strong>hundreds of watts to a few kilowatts of peak power</strong>, usually pulsed at low duty cycle. Research designs push higher: sheet-beam and pseudospark-driven variants have demonstrated or simulated kilowatt-class and multi-kilowatt W-band output. They tune mechanically over a modest range and electronically over a much smaller one — a nine-gap design, for instance, reported continuous electronic tuning of only about <strong>95.5 to 96.2 GHz</strong>. Tubes are not broadband devices.</p>
+
+<p>The closely related <strong>EIK</strong> is the same structure used as an amplifier rather than an oscillator, so you can drive it with a clean low-power source and get the tube's power with the driver's spectral purity. If you care about phase noise <em>and</em> power, this is usually the right architecture: solid-state oscillator, tube amplifier.</p>
+
+</div>
+
+<figure>
+<svg viewBox="0 0 800 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Simplified cross-section of a linear-beam millimetre-wave tube">
+  <defs>
+    <style>
+      .tt{font-family:ui-sans-serif,Helvetica,Arial,sans-serif;font-size:11.5px;fill:#141A1D;font-weight:600}
+      .ts{font-family:ui-sans-serif,Helvetica,Arial,sans-serif;font-size:10px;fill:#5B6771}
+    </style>
+  </defs>
+
+  <!-- envelope -->
+  <rect x="60" y="60" width="620" height="80" fill="#F6F8F8" stroke="#141A1D" stroke-width="1.6"/>
+  <text x="370" y="52" class="ts" text-anchor="middle">evacuated envelope</text>
+
+  <!-- cathode -->
+  <rect x="60" y="78" width="34" height="44" fill="#A9541F"/>
+  <text x="77" y="160" class="tt" text-anchor="middle">Cathode</text>
+  <text x="77" y="175" class="ts" text-anchor="middle">heated, emits</text>
+  <text x="77" y="188" class="ts" text-anchor="middle">electrons</text>
+
+  <!-- beam -->
+  <line x1="94" y1="100" x2="600" y2="100" stroke="#A9541F" stroke-width="2.5"/>
+  <!-- bunches -->
+  <circle cx="130" cy="100" r="3" fill="#A9541F"/>
+  <circle cx="160" cy="100" r="3" fill="#A9541F"/>
+  <circle cx="190" cy="100" r="3" fill="#A9541F"/>
+  <circle cx="222" cy="100" r="3" fill="#A9541F"/>
+  <circle cx="262" cy="100" r="4.5" fill="#A9541F"/>
+  <circle cx="272" cy="100" r="4.5" fill="#A9541F"/>
+  <circle cx="330" cy="100" r="6" fill="#A9541F"/>
+  <circle cx="342" cy="100" r="6" fill="#A9541F"/>
+  <circle cx="410" cy="100" r="7.5" fill="#A9541F"/>
+  <circle cx="490" cy="100" r="7.5" fill="#A9541F"/>
+
+  <!-- interaction gaps -->
+  <g stroke="#1F6F8B" stroke-width="2">
+    <line x1="250" y1="66" x2="250" y2="92"/><line x1="250" y1="108" x2="250" y2="134"/>
+    <line x1="290" y1="66" x2="290" y2="92"/><line x1="290" y1="108" x2="290" y2="134"/>
+    <line x1="330" y1="66" x2="330" y2="92"/><line x1="330" y1="108" x2="330" y2="134"/>
+    <line x1="370" y1="66" x2="370" y2="92"/><line x1="370" y1="108" x2="370" y2="134"/>
+    <line x1="410" y1="66" x2="410" y2="92"/><line x1="410" y1="108" x2="410" y2="134"/>
+    <line x1="450" y1="66" x2="450" y2="92"/><line x1="450" y1="108" x2="450" y2="134"/>
+  </g>
+  <text x="350" y="160" class="tt" text-anchor="middle">Multi-gap resonant cavity</text>
+  <text x="350" y="175" class="ts" text-anchor="middle">its field bunches the beam; the bunches then feed energy back in</text>
+  <text x="350" y="188" class="ts" text-anchor="middle">the cavity dimensions set the frequency — which is why tubes tune only a little</text>
+
+  <!-- collector -->
+  <rect x="600" y="72" width="60" height="56" fill="#5B6771"/>
+  <text x="630" y="160" class="tt" text-anchor="middle">Collector</text>
+  <text x="630" y="175" class="ts" text-anchor="middle">dumps spent beam</text>
+  <text x="630" y="188" class="ts" text-anchor="middle">as heat</text>
+
+  <!-- output -->
+  <rect x="470" y="20" width="14" height="40" fill="none" stroke="#141A1D" stroke-width="1.6"/>
+  <path d="M477,20 L477,8" stroke="#141A1D" stroke-width="1.6" marker-end="url(#a2)"/>
+  <marker id="a2" markerWidth="8" markerHeight="8" refX="4" refY="7" orient="auto">
+    <path d="M1,7 L4,0 L7,7 z" fill="#141A1D"/>
+  </marker>
+  <text x="495" y="26" class="tt">RF out</text>
+  <text x="495" y="41" class="ts">through waveguide + window</text>
+</svg>
+<figcaption>The general shape of a linear-beam millimetre-wave tube such as an EIO. Electrons leave a hot cathode, get bunched by the field in a multi-gap cavity, give up energy to that cavity as they pass, and their remains land on a collector. The cavity's physical size sets the frequency, so a tube built for 94 GHz stays near 94 GHz.</figcaption>
+</figure>
+
+<div class="col">
+
+<h3>Gyrotron</h3>
+
+<p>A gyrotron works on a completely different principle. Instead of bunching electrons along the direction of travel, it puts them in a strong magnetic field so they spiral, and extracts energy from the <em>rotation</em>. The frequency is set mainly by the magnetic field strength rather than by a small machined cavity, which is what lets gyrotrons reach very high frequency and very high power at the same time.</p>
+
+<p>At 95 GHz specifically, a 100 kW continuous-wave gyrotron was developed and demonstrated for a US military programme — the reported tube delivered <strong>115 kW total output at 56% efficiency</strong>, with pulses up to 18 minutes. CPI has separately worked on a 95 GHz design intended for multi-megawatt continuous operation, using a 90 kV, 75 A electron beam and a chemical-vapour-deposition diamond output window.</p>
+
+<p>These are not lab-bench items. They need a superconducting or large water-cooled electromagnet (around 1.8 T even for a compact second-harmonic design producing "only" 5 kW), tens of kilovolts, serious cooling, and radiation shielding for the X-rays that high-voltage electron beams produce. Note also that high-power 95 GHz sources are strongly associated with directed-energy work, so procurement of anything in this class runs into export control and end-use scrutiny.</p>
+
+<h3>Backward-wave oscillator (BWO)</h3>
+
+<p>The BWO's distinguishing feature is that its frequency is set by the beam voltage rather than by a cavity, so you can sweep it electrically over a very wide range — potentially tens of percent. That makes it valuable for spectroscopy and test work. The price is modest power (milliwatts to a watt or so at W band), a short lifetime, and the same kilovolt supply and magnet requirements. It is a niche instrument these days, largely displaced by solid-state multiplier chains.</p>
+
+<h2>One more option: build it from light</h2>
+
+<p>If you need exceptional frequency accuracy rather than power, you can beat two lasers together on a fast photodiode. Two optical tones separated by 90 GHz, mixed on a uni-travelling-carrier photodiode, produce a 90 GHz electrical beat note. Lock the laser separation to an optical frequency comb and you get a millimetre-wave signal with stability that no electronic oscillator can match. Output power is small — typically well under a milliwatt — and the equipment is a laboratory investment, not a component. This is how frequency metrology labs and some radio-astronomy receivers generate their references.</p>
+
+<h2>Choosing</h2>
+
+<table>
+<thead>
+<tr><th>If you need…</th><th>Look at</th><th>Rough budget</th></tr>
+</thead>
+<tbody>
+<tr><td>Anything in 76–81 GHz, cheap, in volume</td><td>Automotive radar SoC (TI AWR, NXP TEF82xx)</td><td>$20–60 per chip</td></tr>
+<tr><td>An agile, programmable lab source anywhere in the band</td><td>Microwave synthesizer + ×6 or ×8 waveguide multiplier</td><td>Tens of thousands</td></tr>
+<tr><td>Best close-in phase noise, tens of milliwatts</td><td>Waveguide Gunn oscillator, phase-locked</td><td>Low thousands per source</td></tr>
+<tr><td>A few hundred milliwatts to a couple of watts</td><td>GaAs or GaN MMIC oscillator plus MMIC power amplifier</td><td>Thousands, plus design effort</td></tr>
+<tr><td>Hundreds of watts to kilowatts, pulsed radar</td><td>EIO, or a driver plus an EIK amplifier</td><td>Tens of thousands and up, long lead times</td></tr>
+<tr><td>Tens of kilowatts or more</td><td>Gyrotron</td><td>A programme, not a purchase</td></tr>
+<tr><td>Extreme frequency accuracy, low power</td><td>Photonic generation on a UTC photodiode</td><td>A laboratory</td></tr>
+</tbody>
+</table>
+
+<div class="note vac">
+<p><strong>Two practical warnings.</strong></p>
+<p>First, above about 50 GHz you cannot use coaxial cable casually. Nearly everything in W band connects through <strong>WR-10 waveguide</strong> with precision flanges. Budget for the plumbing, and for the fact that a few centimetres of the wrong transition can cost you several dB.</p>
+<p>Second, transmitting in this band is regulated almost everywhere. 76–81 GHz is allocated to vehicle radar, 71–76 and 81–86 GHz to licensed fixed links. If your project radiates rather than staying in a shielded enclosure, check your national allocation table early rather than late.</p>
+</div>
+
+<h2>Sources</h2>
+<ul class="refs">
+<li>NXP TEF82xx 76–81 GHz RFCMOS radar transceiver — nxp.com/products/TEF82xx</li>
+<li>TI automotive mmWave radar sensor portfolio and AWR1243 datasheet (×4 multiplier architecture) — ti.com/lit/ds/symlink/awr1243.pdf</li>
+<li>Trinh et al., "A 78.8–84 GHz Phase Locked Loop Synthesizer… in 65 nm CMOS," <em>Sensors</em> 22(10):3626, 2022 — doi.org/10.3390/s22103626</li>
+<li>"W-Band GaAs pHEMT Power Amplifier MMIC Stabilized Using Network Determinant Function," 88–98 GHz, 24 dBm — PMC11767286</li>
+<li>"Recent Advances in mm-Wave and Sub-THz/THz Oscillators for FutureG Technologies" — arXiv (GaN 92–103 GHz quadrupler)</li>
+<li>US Patent 7,177,781 (Farran GV-10 94 GHz Gunn VCO; Millitech 35 GHz source with tripler to 105 GHz)</li>
+<li>Steer, Roitman, Horoyski et al., CPI Canada — Extended Interaction Klystron technology at millimetre and sub-millimetre wavelengths</li>
+<li>"Demonstration of a 95 GHz, 100 kW, CW gyrotron oscillator" (115 kW, 56% efficiency, 18-minute pulses)</li>
+<li>Felch et al., "Multi-Megawatt Operation of a 95 GHz Gyrotron," CPI — APS DPP 2010</li>
+<li>"95-GHz Gyrotron With Room Temperature dc Solenoid" (TE02, second harmonic, ~5 kW, 1.8 T)</li>
+<li>Shu et al., "Demonstration of a planar W-band, kW-level extended interaction oscillator based on a pseudospark-sourced sheet electron beam," <em>IEEE EDL</em> 39(3), 2018</li>
+</ul>
+
+</div>
+</div>
+</body>
+</html>
